@@ -1,7 +1,3 @@
-# HAllo Friedrich
-
-
-
 # Overview of the VoxelApproach to determine Biomass on various biomes and 
 
 DataPath<-"C:/Daten/owncloud/Projects/VoxelApproach/Daten/"
