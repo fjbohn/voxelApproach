@@ -47,7 +47,6 @@ BCIv50Presence<-CreateVoxelProfile(remsen,"agb",coord=BCI50Points$xyz[,1:2],reso
 BCIv20Presence<-CreateVoxelProfile(remsen,"agb",coord=BCI20Points$xyz[,1:2],resolution=BCI20Points$resolution,sampling==BCI20Points$sampling, dist=1, sample.size=100, shape = BCI20Points$shape, method="presence",return.fineMAP=F,voxelsize=1,side=BCI20Points$resolution^0.5)
 
 
-
 source(fitParameters.r)
 VoxelBasedAGBMaps<-list()
 
