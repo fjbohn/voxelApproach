@@ -22,7 +22,7 @@ CreateMapInventory <- function(inventory, variable, resolution = 10000, sampling
   # debug: inventory=census; variable="AGB"
  
   # fine resulution Map
-  factor <- 1/res
+  factor <- 1 / res
   fineMap <- projectionMap(inventory, variable = variable, type = method, res = res)
   
   if (return.fineMAP) {
@@ -53,7 +53,7 @@ CreateMapInventory <- function(inventory, variable, resolution = 10000, sampling
     if (sampling == "quadratic") {
       side <- sqrt(resolution)
       
-      if (side*factor%%1 != 0) {
+      if (side * factor %% 1 != 0) {
         warning("Your resolution fit not into the fineMap Raster!")
         side <- round(side*factor, digits = 0) / factor
         warning(paste("Your new adapted resolution is now:", side^2," m²"))
@@ -66,7 +66,7 @@ CreateMapInventory <- function(inventory, variable, resolution = 10000, sampling
       patches[, 1] <- rep(lat, length(long))
       patches[, 2] <- rep(long, each = length(lat))
     }
-    if(sampling=="random"){
+    if (sampling == "random") {
       cut("totdo")
     }
   }
@@ -76,7 +76,7 @@ CreateMapInventory <- function(inventory, variable, resolution = 10000, sampling
   maxy <- ceiling(max(inventory$Y))
   lat <- seq(0, maxx, res)
   long <- seq(maxy, 0, -res)
-  finexyz <- cbind(rep(lat, length(long)), rep(long, each=length(lat)), as.vector(fineMap))
+  finexyz <- cbind(rep(lat, length(long)), rep(long, each = length(lat)), as.vector(fineMap))
   xyz <- matrix(nrow = nrow(patches), ncol = 3)
   
   map <- list()
