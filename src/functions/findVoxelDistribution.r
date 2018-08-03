@@ -1,4 +1,4 @@
-#' ATTANTION only 1 m³ voxel allowed
+#' ATTENTION only 1 m³ voxel allowed
 #' @param coord vector()
 #' @param side numeric. side variable of map
 #' @param shape character string, type of shape
