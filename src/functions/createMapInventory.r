@@ -15,51 +15,56 @@
 #' @export
 #' @examples in progress
 #' @author Nikolai Knapp, nikolai.knapp@ufz.de
-CreateMapInventory<-function(inventory,variable,resolution=10000,sampling="quadratic", dist=1, sample.size=100, shape = "square", method="stem",return.fineMAP=F, res=0.1,CDParam=c(18.16,0.68)){
+CreateMapInventory <- function(inventory, variable, resolution = 10000, sampling = "quadratic", 
+                             dist = 1, sample.size=100, shape = "square", method = "stem",
+                             return.fineMAP = F, res = 0.1, CDParam = c(18.16, 0.68)) {
   
   # debug: inventory=census; variable="AGB"
  
   # fine resulution Map
-  factor<-1/res
-  fineMap<-projectionMap(inventory,variable=variable,type=method,res=res)
+  factor <- 1/res
+  fineMap <- projectionMap(inventory, variable = variable, type = method, res = res)
   
-  if(return.fineMAP){
-    farbe<-openColours("jet",n=100)
-    image(fineMap,col=farbe)
+  if (return.fineMAP) {
+    farbe <- openColours("jet", n = 100)
+    image(fineMap, col = farbe)
     IMreturn(fineMap)
     break
   }
+  
   ##*********************************
   # patch cutting
   ##********************************
   
   #omitting edg effects trees not included in the inventory
-  if(method!="stem"){
-    xMax<-round(max(inventory$X[]),digits=0)-20
-    yMax<-round(max(inventory$Y[]),digits=0)-20
-    xMin<-20
-    yMin<-20
-  }else{
-    xMax<-round(max(inventory$X[]),digits=0)
-    yMax<-round(max(inventory$Y[]),digits=0)
-    xMin<-0
-    yMin<-0
+  if (method != "stem") {
+    xMax <- round(max(inventory$X[]), digits = 0) - 20
+    yMax <- round(max(inventory$Y[]), digits = 0) - 20
+    xMin <- 20
+    yMin <- 20
+  } else {
+    xMax <- round(max(inventory$X[]), digits = 0)
+    yMax <- round(max(inventory$Y[]), digits = 0)
+    xMin <- 0
+    yMin <- 0
   }
   # list of patches
-  if(shape=="square"){
-    if(sampling=="quadratic"){
-      side<-sqrt(resolution)
-      if(side*factor%%1!=0){
-        warning("your resolution fit not into the fineMap Raster")
-        side<-round(side*factor,digits=0)/factor
-        warning(paste("your new adapted resolution is now:",side^2,"m²"))
+  if (shape == "square") {
+    if (sampling == "quadratic") {
+      side <- sqrt(resolution)
+      
+      if (side*factor%%1 != 0) {
+        warning("Your resolution fit not into the fineMap Raster!")
+        side <- round(side*factor, digits = 0) / factor
+        warning(paste("Your new adapted resolution is now:", side^2," m²"))
       }
-      if(dist<0)warning("dist must be greater than 0")
-      lat<-seq(yMin,xMax-side,side*dist)
-      long<-seq(yMin,yMax-side,side*dist)
-      patches<-matrix(nrow=length(long)*length(lat),ncol=2)
-      patches[,1]<-rep(lat,length(long))
-      patches[,2]<-rep(long,each=length(lat))
+      
+      if (dist < 0) warning("dist must be greater than 0")
+      lat <- seq(yMin, xMax - side, side * dist)
+      long <- seq(yMin, yMax - side, side * dist)
+      patches <- matrix(nrow = length(long) * length(lat), ncol = 2)
+      patches[, 1] <- rep(lat, length(long))
+      patches[, 2] <- rep(long, each = length(lat))
     }
     if(sampling=="random"){
       cut("totdo")
@@ -67,32 +72,34 @@ CreateMapInventory<-function(inventory,variable,resolution=10000,sampling="quadr
   }
   
   # data of patches
-  maxx<-ceiling(max(inventory$X))
-  maxy<-ceiling(max(inventory$Y))
-  lat<-seq(0,maxx,res)
-  long<-seq(maxy,0,-res)
-  finexyz<-cbind(rep(lat,length(long)),rep(long,each=length(lat)),as.vector(fineMap))
-  xyz<-matrix(nrow=nrow(patches),ncol=3)
+  maxx <- ceiling(max(inventory$X))
+  maxy <- ceiling(max(inventory$Y))
+  lat <- seq(0, maxx, res)
+  long <- seq(maxy, 0, -res)
+  finexyz <- cbind(rep(lat, length(long)), rep(long, each=length(lat)), as.vector(fineMap))
+  xyz <- matrix(nrow = nrow(patches), ncol = 3)
   
-  
-  map<-list()
-  finexyz<-data.table(finexyz)
-  colnames(finexyz)<-c("lat","long","variable")
-  if(shape=="square"){
-    if(sampling == "quadratic"){
+  map <- list()
+  finexyz <- data.table(finexyz)
+  colnames(finexyz) <- c("lat", "long", "variable")
+  if (shape == "square") {
+    if (sampling == "quadratic") {
       
-      for(i in 1:nrow(patches)){
-        lines<-which(finexyz$lat>=patches[i,1] & finexyz$lat<patches[i,1]+side & finexyz$long>=patches[i,2] & finexyz$long<patches[i,2]+side)
-        xyz[i,3]<-sum(finexyz[lines,3])*10000/resolution
-        xyz[i,1:2]<-patches[i,]
+      for (i in 1:nrow(patches)) {
+        lines <- which(finexyz$lat >= patches[i, 1] 
+                       & finexyz$lat < patches[i, 1] + side 
+                       & finexyz$long >= patches[i, 2] 
+                       & finexyz$long < patches[i, 2] + side)
+        xyz[i, 3] <- sum(finexyz[lines, 3]) * 10000 / resolution
+        xyz[i, 1:2] <- patches[i, ]
       }
-      map[[1]]<-xyz
-      map[[2]]<-sampling
-      map[[3]]<-shape
-      map[[4]]<-resolution
-      map[[5]]<-method
-      map[[6]]<-side
-      names(map)<-c("xyz","sampling","shape","resolution","method","side")
+      map[[1]] <- xyz
+      map[[2]] <- sampling
+      map[[3]] <- shape
+      map[[4]] <- resolution
+      map[[5]] <- method
+      map[[6]] <- side
+      names(map) <- c("xyz", "sampling", "shape", "resolution", "method", "side")
     } 
   }
   return(map)
